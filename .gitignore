@@ -1,0 +1,19 @@
+# Secret keys
+.env
+application.properties (if it contains passwords)
+
+# Docker and OS
+mysql_data/
+uploads/
+__pycache__/
+.DS_Store
+
+# Java
+target/
+*.class
+.gradle/
+.idea/
+
+# Python
+venv/
+*.pyc

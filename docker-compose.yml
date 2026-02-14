@@ -1,0 +1,49 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:8
+    container_name: ai-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: R00tadminswati
+      MYSQL_DATABASE: aidocs
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  ai-service:
+    build: ./ai-service
+    container_name: ai-python
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+    volumes:
+      - ./uploads:/app/uploads
+    depends_on:
+      - mysql
+
+  backend:
+    build: ./backend
+    container_name: ai-backend
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - AI_SERVICE_URL=http://ai-python:8000
+      - SPRING_DATASOURCE_URL=jdbc:mysql://ai-mysql:3306/aidocs
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=R00tadminswati
+    volumes:
+      - ./uploads:/app/uploads
+    depends_on:
+      ai-service:
+        condition: service_started
+      mysql:
+        condition: service_started
+
+volumes:
+  mysql_data:
